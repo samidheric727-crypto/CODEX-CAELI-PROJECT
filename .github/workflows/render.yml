@@ -1,0 +1,44 @@
+name: Render real Blender MPFB2 character
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/render.yml'
+      - 'scripts/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  blender-mpfb:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    steps:
+      - name: Checkout Codex Caeli project
+        uses: actions/checkout@v4
+      - name: Install Blender, MPFB2 and CC0 character assets
+        run: bash scripts/setup_renderer.sh
+      - name: Generate skinned human and editable Blender scene
+        run: |
+          ./tools/blender-4.2.3-linux-x64/blender -b --python scripts/build_scene.py
+          test -s output/CODEX_CAELI_SELENA_MPFBRIG.blend
+      - name: Render test frame
+        run: ./tools/blender-4.2.3-linux-x64/blender -b output/CODEX_CAELI_SELENA_MPFBRIG.blend -o "$GITHUB_WORKSPACE/output/frame_" -f 80
+      - name: Render all 180 frames
+        run: ./tools/blender-4.2.3-linux-x64/blender -b output/CODEX_CAELI_SELENA_MPFBRIG.blend -o "$GITHUB_WORKSPACE/output/frame_" -a
+      - name: Encode 15-second 9:16 MP4
+        run: |
+          ffmpeg -y -framerate 12 -start_number 1 -i output/frame_%04d.png -c:v libx264 -pix_fmt yuv420p -crf 19 -movflags +faststart output/CODEX_CAELI_15S_MPFBRIG.mp4
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 output/CODEX_CAELI_15S_MPFBRIG.mp4
+      - name: Upload MP4 and Blender project
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: codex-caeli-real-mpfb2-render
+          path: |
+            output/CODEX_CAELI_15S_MPFBRIG.mp4
+            output/CODEX_CAELI_SELENA_MPFBRIG.blend
+            output/frame_0080.png
+          if-no-files-found: warn
+          retention-days: 7
