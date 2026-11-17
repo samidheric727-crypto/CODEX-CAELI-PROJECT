@@ -25,8 +25,8 @@ jobs:
             status="$(gh api "repos/$GH_REPO/actions/runs/$id" --jq .status)"
             echo "Old run $id: $status"
             if [ "$status" = "in_progress" ] || [ "$status" = "queued" ] || [ "$status" = "waiting" ]; then
-              gh api -X POST "repos/$GH_REPO/actions/runs/$id/cancel"
-              echo "Cancellation requested for $id"
+              gh api -X POST "repos/$GH_REPO/actions/runs/$id/force-cancel"
+              echo "Force-cancellation requested for $id"
             else
               echo "Already finished: $id"
             fi
