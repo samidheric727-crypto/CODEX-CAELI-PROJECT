@@ -12,7 +12,7 @@ BLENDER="$ROOT/tools/blender-4.2.3-linux-x64/blender"
 "$BLENDER" --version | head -2
 
 git clone --depth 1 --branch master https://github.com/makehumancommunity/mpfb2.git "$ROOT/tools/mpfb2"
-(cd "$ROOT/tools/mpfb2/src" && zip -qr "$ROOT/tools/mpfb.zip" mpfb)
+(cd "$ROOT/tools/mpfb2/src/mpfb" && zip -qr "$ROOT/tools/mpfb.zip" .)
 "$BLENDER" -b --command extension install-file -r user_default -e "$ROOT/tools/mpfb.zip"
 
 ASSET_ZIP="$ROOT/tools/makehuman_system_assets_cc0.zip"
