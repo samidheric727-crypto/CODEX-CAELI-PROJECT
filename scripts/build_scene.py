@@ -98,6 +98,8 @@ for f in (1,15,30,45,60,75,90,105,120,135,150,165,180):
     bone("RightForeArm",(0,0,-25 if f<70 else -45),f)
     bone("LeftArm",(-15,0,-13),f)
     bone("LeftForeArm",(0,0,-27 if f<95 else -19),f)
+# MPFB may purge materials with zero users; recreate the lamp material after adding character assets.
+bronze=material("bronze | retained after MPFB import",(.4,.22,.11),.65)
 cub("desk lamp base",(-1.1,-.5,1.14),(.22,.22,.06),bronze)
 cub("desk lamp stem",(-1.1,-.5,1.44),(.06,.06,.55),bronze)
 cub("desk lamp shade",(-1.1,-.5,1.76),(.43,.35,.17),bronze)
