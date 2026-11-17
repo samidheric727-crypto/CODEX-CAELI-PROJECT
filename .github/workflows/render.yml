@@ -13,20 +13,25 @@ permissions:
 jobs:
   blender-mpfb:
     runs-on: ubuntu-24.04
-    timeout-minutes: 330
+    timeout-minutes: 75
     steps:
       - name: Checkout Codex Caeli project
         uses: actions/checkout@v4
-      - name: Install Blender, MPFB2 and CC0 character assets
+      - name: Install Blender from official mirrors with cache
+        uses: bradyajohnston/setup-blender@v5
+        with:
+          version: '4.2'
+      - name: Install MPFB2 and CC0 character assets
+        timeout-minutes: 15
         run: bash scripts/setup_renderer.sh
       - name: Generate skinned human and editable Blender scene
         run: |
-          ./tools/blender-4.2.3-linux-x64/blender -b --python scripts/build_scene.py
+          blender -b --python scripts/build_scene.py
           test -s output/CODEX_CAELI_SELENA_MPFBRIG.blend
       - name: Render test frame
-        run: ./tools/blender-4.2.3-linux-x64/blender -b output/CODEX_CAELI_SELENA_MPFBRIG.blend -o "$GITHUB_WORKSPACE/output/frame_" -f 80
+        run: blender -b output/CODEX_CAELI_SELENA_MPFBRIG.blend -o "$GITHUB_WORKSPACE/output/frame_" -f 80
       - name: Render all 180 frames
-        run: ./tools/blender-4.2.3-linux-x64/blender -b output/CODEX_CAELI_SELENA_MPFBRIG.blend -o "$GITHUB_WORKSPACE/output/frame_" -a
+        run: blender -b output/CODEX_CAELI_SELENA_MPFBRIG.blend -o "$GITHUB_WORKSPACE/output/frame_" -a
       - name: Encode 15-second 9:16 MP4
         run: |
           ffmpeg -y -framerate 12 -start_number 1 -i output/frame_%04d.png -c:v libx264 -pix_fmt yuv420p -crf 19 -movflags +faststart output/CODEX_CAELI_15S_MPFBRIG.mp4
