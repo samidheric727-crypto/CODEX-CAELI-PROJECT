@@ -5,7 +5,7 @@ mkdir -p "$ROOT/tools" "$ROOT/assets" "$ROOT/output"
 sudo apt-get update -qq
 sudo apt-get install -y -qq curl wget unzip zip git ffmpeg xz-utils libegl1 libgl1 libxi6 libxxf86vm1 libxfixes3 libxrender1 libxkbcommon0 libsm6 >/dev/null
 
-BLENDER_RELEASE="https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz"
+BLENDER_RELEASE="https://mirror.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz"
 curl -fL --retry 3 --connect-timeout 30 "$BLENDER_RELEASE" -o "$ROOT/tools/blender.tar.xz"
 tar -xf "$ROOT/tools/blender.tar.xz" -C "$ROOT/tools"
 BLENDER="$ROOT/tools/blender-4.2.3-linux-x64/blender"
