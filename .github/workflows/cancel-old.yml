@@ -1,0 +1,34 @@
+name: Cancel obsolete render attempts
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cancel-old.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  cancel-obsolete:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel only two obsolete runs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          for id in 44149594447 44149734111; do
+            status="$(gh api "repos/$GH_REPO/actions/runs/$id" --jq .status)"
+            echo "Old run $id: $status"
+            if [ "$status" = "in_progress" ] || [ "$status" = "queued" ] || [ "$status" = "waiting" ]; then
+              gh api -X POST "repos/$GH_REPO/actions/runs/$id/cancel"
+              echo "Cancellation requested for $id"
+            else
+              echo "Already finished: $id"
+            fi
+          done
+          echo "Latest render run 44155105045 is intentionally untouched."
